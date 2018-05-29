@@ -1,0 +1,7 @@
+src/*
+dist/test/*
+build.sh
+.jshintrc
+.gitignore
+.vscode
+yarn.lock

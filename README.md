@@ -18,7 +18,7 @@ send to alice bob carol. text Hello, world.
 
 ## Basic grammar and options
 
-Let's consider the first example 'reminder due tomorrow todo Get two bottles of milk'. While defining the reminder app's options, we must specify that the option "due" takes a single parameter, and todo takes multiple parameters.
+Let's consider the first example 'reminder due tomorrow todo Get two bottles of milk'. While defining the reminder app's options, we must specify that the option 'due' takes a single parameter, and todo takes multiple parameters.
 
 ```javascript
 const options = {
@@ -67,10 +67,10 @@ This is also valid, of course.
 send to alice bob carol. private. text Hello, world
 ```
 
-Finally, what if there is a period in the argument itself. For instance, what if the text you want to send is "Hello, world."? You'll have to 'escape' it by adding an additional period.
+Finally, what if there is a period in the argument itself? For instance, the text you want to send might be 'Hello, world.'. You'll have to 'escape' the period in the argument by adding an additional period.
 
 ```bash
-# Notice the additional period.
+# Notice the additional period after Hello, world.
 send to alice bob carol. text Hello, world..
 ```
 

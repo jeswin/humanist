@@ -125,8 +125,8 @@ imessage to alice bob carol. text Hmm...... Hello.. World.
 If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.
 
 ```bash
-# jeswin.pk does not require escaping since the '.' is not followed by a space
-imessage to jeswin.pk@jeswin.org text Hi
+# jeswin.org does not require escaping since the '.' is not followed by a space
+imessage to mailbox@jeswin.org text Hi
 
 # 'Hello, world.' does not require escaping since the '.' is at the end.
 imessage to jeswin text Hello, world.

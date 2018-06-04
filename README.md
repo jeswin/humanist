@@ -74,7 +74,7 @@ Finally, what if there is a period in the argument itself? For instance, the tex
 send to alice bob carol. text Hello, world..
 ```
 
-One more thing. If the period is not immediately followed by a space, it does not require any special handling. In the following example 'jeswin.pk' does not require 'escaping'.
+One more thing. If the period is not immediately followed by a space, it does not require escaping. In the following example 'jeswin.pk' does not require 'escaping'.
 
 ```bash
 send to jeswin.pk@jeswin.org text Hello, world.

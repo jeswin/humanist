@@ -41,7 +41,7 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 
 ### Multiple options of arbitrary length (Delimiters)
 
-Periods can be used a delimiters for options anywhere in the sentence. A trailing period is not considered a delimiter.
+Periods can be used as delimiters anywhere in the sentence. A trailing period is not considered a delimiter.
 
 ```bash
 send to alice bob carol. text Hello, world.
@@ -66,11 +66,11 @@ Simply specify zero as the argument count. Here's an example, with a flag called
 ```bash
 send private to alice bob carol. text Hello, world.
 
-#This is also valid, of course.
+# This is also valid, of course.
 send to alice bob carol. private. text Hello, world.
 ```
 
-Options, with args length set to zero. Humanist parses flags as a boolean.
+Options, with args length set to zero. Humanist parses flags as booleans.
 
 ```javascript
 const options = [
@@ -111,11 +111,11 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 If there's a literal period in the option's value (say, "Hello. World."), it will need to be escaped by adding an additional period.
 
 ```bash
-# When the user wants to send Hello. World.
+# When the user wants to say Hello. World.
 imessage to alice bob carol. text Hello.. World.
 ```
 
-Every literal period will require escaping.
+Each literal period will require escaping.
 
 ```bash
 # Hmm... Hello. World.
@@ -125,16 +125,16 @@ imessage to alice bob carol. text Hmm...... Hello.. World.
 If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.
 
 ```bash
-# jeswin.org does not require escaping since the '.' is not followed by a space
+# The period in jeswin.org does not require escaping since the '.' is not followed by a space
 imessage to mailbox@jeswin.org text Hi
 
-# 'Hello, world.' does not require escaping since the '.' is at the end.
+# The period in 'Hello, world.' does not require escaping since the '.' is at the end.
 imessage to jeswin text Hello, world.
 ```
 
 ### Unmatched args at the end of the sentence
 
-Humanist also provides a list of unmatched arguments as the underscore property.
+Humanist captures the list of unmatched arguments as the underscore property.
 
 ```javascript
 const options = [["to", Infinity]];
@@ -143,8 +143,8 @@ const parser = humanist(options);
 /* Prints:
   {
     to: ["alice", "bob", "carol"],
-    _: ["Hello,", "world"]
+    _: ["Hello,", "world."]
   }
 */
-console.log(parser("to alice bob carol. Hello, world"));
+console.log(parser("to alice bob carol. Hello, world."));
 ```

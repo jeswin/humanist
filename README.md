@@ -1,118 +1,98 @@
 # humanist
-A specification and parser for easy-to-understand command line options.
 
-Goals:
+A specification and parser for command line options, with a focus on ease of typing. When using humanist to parse command line options, it is recommended to stay close to natural language. That would make humanist-based options a good fit for communicating with bots.
 
-- Easy to type on computers and mobiles
-- Should be similar to natural language
+## What does it look like?
 
-## Examples of messages we'll try to parse
+Assuming your app is called 'reminder':
 
 ```bash
-# Add a todo via an imaginary todo bot
-todo due tomorrow Get two bottles of milk
-
-# Alternate form
-todo task Get two bottles of milk. due tomorrow
-
-
-
-# Message to a bot which publishes blog posts.
-publish <post_id> title Announcing Humanist
+reminder due tomorrow todo Get two bottles of milk
 ```
 
-## Defining Options
+Or if you have a messaging app called 'send':
 
-We must define possible options we want to parse during initialization. 
+```bash
+send to alice bob carol. text Hello, world.
+```
 
-Humanist supports the following options.
+## Basic grammar and options
 
-- Boolean value
-- String value
-- Single-word option
-- Multi-word option
-- Unnamed words
-
-### Boolean flag:
+Let's consider the first example 'reminder due tomorrow todo Get two bottles of milk'. While defining the reminder app's options, we must specify that the option "due" takes a single parameter, and todo takes multiple parameters.
 
 ```javascript
-// A boolean flag
-const parse = humanist({
-  completed: "boolean"
-});
-const str = "blog delete";
-// { completed: true }
-console.log(parse(str)); 
+const options = {
+  due: 1, // takes a single argument
+  todo: { multi: true } // takes multiple arguments
+};
 ```
 
-The option can also be a regex. With slightly verbose syntax.
-
-
-schema = [
-  "publisj",
-  postId,
-  any([
-    captureIf(x => x === "publish"),
-    captureIf(x => x === "")
-]
-
-
+You could also write this as:
 
 ```javascript
-// A boolean flag
-const parse = humanist({
-  completed: { type: "boolean", regex: /completed?/ }
-});
-const str1 = "todo complete";
-const str2 = "todo completed";
-// { completed: true }
-console.log(parse(str1)); 
-// { completed: true }
-console.log(parse(str2)); 
+const options = {
+  due: { multi: false, args: 1 },
+  todo: { multi: true }
+};
 ```
 
-### String value
+What if there are several mutli-parameter options? That's where the period comes handy - 'send to alice bob carol. text Hello, world.'
 
-Assume we want to capture the id of a certain todo.
-Let's assume anything that starts with an "@" is an id.
+You'd use the same structure to specify options:
 
 ```javascript
-// A boolean flag
-const parse = humanist({
-  completed: { type: "boolean", regex: /completed?/ },
-  todoId: { type: "string", regex: /^\@/ }
-});
-const str1 = "todo @200 complete";
-// { todoId: "@200", completed: true }
-console.log(parse(str1)); 
+const options = {
+  to: { multi: true },
+  text: { multi: true }
+};
 ```
 
-### Single-word options
+What about options which don't need an argument? They're called flags; just specify zero as the argument count. Here's an example, with a flag called 'private'
 
 ```javascript
-// A boolean flag
-const parse = humanist({
-  add: 
-  completed: { type: "boolean", regex: /completed?/ },
-  todoId: { type: "string", regex: /^\@/ }
-});
-const str1 = "todo add complete";
-// { todoId: "@200", completed: true }
-console.log(parse(str1)); 
+const options = {
+  to: { multi: true },
+  text: { multi: true },
+  private: 0 // means it's a flag
+};
 ```
 
+```bash
+send to alice bob carol. private. text Hello, world
+```
 
-### Single-word options
+Finally, what if there is a period in the argument itself. For instance, what if the text you want to send is "Hello, world."? You'll have to 'escape' it by adding an additional period.
+
+```bash
+# Notice the additional period.
+send to alice bob carol. text Hello, world..
+```
+
+One more thing. If the period is not immediately followed by a space, it does not require any special handling. In the following example 'jeswin.pk' does not require 'escaping'.
+
+```bash
+send to jeswin.pk@jeswin.org text Hello, world.
+```
+
+## Using humanist in nodejs and browser projects
 
 ```javascript
-// A boolean flag
-const parse = humanist({
-  add: 
-  completed: { type: "boolean", regex: /completed?/ },
-  todoId: { type: "string", regex: /^\@/ }
-});
-const str1 = "todo add complete";
-// { todoId: "@200", completed: true }
-console.log(parse(str1)); 
+const options = {
+  to: { multi: true },
+  text: { multi: true },
+  private: 0
+};
+const parser = humanist(options);
+
+/* Prints:
+  {
+    to: ["alice", "bob", "carol"],
+    private: true,
+    text: ["Hello,", "world"]
+  }
+*/
+console.log(parser("send to alice bob carol. private. text Hello, world"));
 ```
+
+
 

@@ -58,6 +58,12 @@ const options = {
 ```
 
 ```bash
+send private to alice bob carol. text Hello, world
+```
+
+This is also valid, of course.
+
+```bash
 send to alice bob carol. private. text Hello, world
 ```
 

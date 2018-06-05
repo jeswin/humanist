@@ -25,7 +25,13 @@ function unescapePeriod(arg: string): string {
 
 function argIsTerminated(arg: string): [boolean, string] {
   const periods = /((\.)+)$/.exec(arg);
-  return periods ? [periods[1].length % 2 !== 0, arg] : [false, arg];
+  return periods 
+    ? (() => {
+      const isOdd = periods[1].length % 2 !== 0
+      return isOdd
+        ? [isOdd, arg.replace()]
+    })()
+  [, arg] : [false, arg];
 }
 
 export default function humanist(options: OptionEntry[]) {

@@ -16,6 +16,13 @@ Or with a messaging app called 'imessage':
 imessage to alice bob carol. text Hello, world.
 ```
 
+Options are not case-sensitive. These two are the same.
+
+```bash
+imessage to alice bob carol. text Hello, world.
+imessage To alice bob carol. Text Hello, world.
+```
+
 ## Basic grammar and options
 
 Let's consider the first example:
@@ -116,11 +123,11 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 
 ### Escaping periods in arguments
 
-If there's one or more literal periods in the option's value (say, "Hello... World."), it will need to be escaped by adding one additional period. For instance, add 4 periods where 3 is needed.
+If there are one or more literal periods at the end of the option's value (say, "Hello... World"), the literal periods will need to be 'escaped'. Escaping is done by replacing every literal period with two periods. 
 
 ```bash
-# To say Hello... World, use 4 periods instead of 3.
-imessage to alice bob carol. text Hello.... World.
+# To say "Hello... World", use 6 periods instead of 3.
+imessage to alice bob carol. text Hello...... World
 ```
 
 If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.
@@ -129,7 +136,7 @@ If the period is not immediately followed by a space or if the period is at the 
 # The period in jeswin.org does not require escaping since the '.' is not followed by a space
 imessage to mailbox@jeswin.org text Hi
 
-# The period in 'Hello, world.' does not require escaping since the '.' is at the end.
+# The period in 'Hello, world.' does not require escaping since the '.' is at the end of the sentence.
 imessage to jeswin text Hello, world.
 ```
 

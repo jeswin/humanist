@@ -9,7 +9,7 @@ export interface IOptionSettings {
   join?: boolean;
 }
 
-export type OptionEntry = [string, number, IOptionSettings];
+export type OptionEntry = [string, number] | [string, number, IOptionSettings];
 
 function concat<T>(x: T[], y: T[]) {
   return x.concat(y);
@@ -23,32 +23,10 @@ function unescapePeriod(arg: string): string {
   return "";
 }
 
-// function normalizeArgs(args: string[]): string[] {
-//   const last = args.slice(-1)[0];
-//   const rest = args.slice(0, -1);
-//   const r = rest.reduce((acc, arg) => {
-//     const []
-//   }, [[]] as string[][]);
-//   const results = flatMap(
-//     x =>
-//       x.endsWith(".")
-//         ? !x.endsWith("..")
-//           ? x.substring(0, x.length - 1)
-//           :
-//         :
-//       x.endsWith("..")
-//         ? (() => {
-//             const periods = /((\.\.)+)$/.exec(x);
-//             return periods.length > 1
-//             ?
-//              : 2;
-//             return [x];
-//           })()
-//         : [x],
-//     rest
-//   );
-//   return results.concat(last);
-// }
+function argIsTerminated(arg: string): [boolean, string] {
+  const periods = /((\.)+)$/.exec(arg);
+  return periods ? [periods[1].length % 2 !== 0, arg] : [false, arg];
+}
 
 export default function humanist(options: OptionEntry[]) {
   return (argsStringOrArray: string | string[]) => {
@@ -70,40 +48,78 @@ export default function humanist(options: OptionEntry[]) {
       return args.length > cursor
         ? (() => {
             const item = args[cursor];
-            const matchingOpt = options.find(o => o[0] === item);
+            const matchingOpt = options.find(
+              o => o[0].toLowerCase() === item.toLowerCase()
+            );
             return matchingOpt
               ? (() => {
-                  const [name, numArgs, settings] = matchingOpt;
-                  return numArgs === 0
-                    ? ((acc[name] = true), loop(acc, cursor + 1))
-                    : numArgs === 1
-                      ? cursor + 1 < args.length
-                        ? ((acc[name] = args[cursor + 1]),
-                          loop(acc, cursor + 2))
-                        : exception(
-                            `Cannot read command line option ${name} which takes 1 argument.`
-                          )
-                      : numArgs < Infinity
-                        ? cursor + numArgs < args.length
-                          ? ((acc[name] = args.slice(cursor + 1, numArgs)),
-                            loop(acc, cursor + numArgs + 1))
+                  const [name, numArgs] = matchingOpt;
+                  /* Flags - Options without arguments */
+                  return numArgs >= 0
+                    ? numArgs === 0
+                      ? ((acc[name] = true), loop(acc, cursor + 1))
+                      : /* Options with one argument */
+                        numArgs === 1
+                        ? cursor + 1 < args.length
+                          ? ((acc[name] = args[cursor + 1]),
+                            loop(acc, cursor + 2))
                           : exception(
-                              `Cannot read command line option ${name} which takes ${numArgs} arguments.`
+                              `Cannot read command line option ${name} which takes 1 argument.`
                             )
-                        : numArgs === Infinity
-                          ? cursor + 1 < args.length
-                            ? ((acc[name] = args[cursor + 1]),
-                              loop(acc, cursor + 2))
+                        : /* Options with mutliple arguments */
+                          numArgs < Infinity
+                          ? cursor + numArgs < args.length
+                            ? ((acc[name] = args.slice(
+                                cursor + 1,
+                                cursor + numArgs + 1
+                              )),
+                              loop(acc, cursor + numArgs + 1))
                             : exception(
-                                `Cannot read command line option ${name}.`
+                                `Option ${name} needs ${numArgs} arguments, found ${args.length -
+                                  (cursor + 1)}.`
                               )
-                          : exception(
-                              `The option ${name} cannot have ${numArgs} args. Invalid configuration.`
-                            );
+                          : /* Options with arbitrary arguments */
+                            (() => {
+                              const optArgs = (function loopToTerminator(
+                                argAcc: string[],
+                                i: number
+                              ): any {
+                                const arg = args[cursor + 1 + i];
+                                return cursor + 1 + i === args.length - 1
+                                  ? argAcc.concat(arg)
+                                  : (() => {
+                                      const [
+                                        isTerminated,
+                                        escapedArg
+                                      ] = argIsTerminated(arg);
+                                      return isTerminated
+                                        ? argAcc.concat(escapedArg)
+                                        : loopToTerminator(
+                                            argAcc.concat(escapedArg),
+                                            i + 1
+                                          );
+                                    })();
+                              })([], 0);
+                              /* See if need to send back a string */
+                              return (
+                                (acc[name] =
+                                  matchingOpt[2] &&
+                                  (matchingOpt[2] as IOptionSettings).join
+                                    ? optArgs.join(" ")
+                                    : optArgs),
+                                loop(acc, cursor + optArgs.length + 1)
+                              );
+                            })()
+                    : /* Arg count should be a number gte zero */
+                      exception(
+                        `The option ${name} cannot have ${numArgs} args. Invalid configuration.`
+                      );
                 })()
               : (acc._.push(item), loop(acc, cursor + 1));
           })()
         : acc;
     })({ _: [] }, 0);
+
+    return result;
   };
 }

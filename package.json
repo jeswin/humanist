@@ -1,7 +1,6 @@
 {
   "name": "humanist",
-  "private": true,
-  "version": "0.0.3",
+  "version": "0.0.1",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,8 +10,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^10.0.6",
-    "chimpanzee": "^0.0.66"
+    "@types/node": "^10.0.6"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.0",

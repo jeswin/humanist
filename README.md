@@ -87,6 +87,14 @@ const options = [
 }
 */
 console.log(parser("private to alice bob carol. text Hello, world."));
+
+/*
+  Passing an array of words yields the same result.
+  With nodejs, you can pass the command line param array.
+*/
+console.log(
+  parser(["private", "to", "alice", "bob", "carol.", "text", "Hello", "world."])
+);
 ```
 
 ### Join arguments
@@ -108,18 +116,11 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 
 ### Escaping periods in arguments
 
-If there's a literal period in the option's value (say, "Hello. World."), it will need to be escaped by adding an additional period.
+If there's one or more literal periods in the option's value (say, "Hello... World."), it will need to be escaped by adding one additional period. For instance, add 4 periods where 3 is needed.
 
 ```bash
-# When the user wants to say Hello. World.
-imessage to alice bob carol. text Hello.. World.
-```
-
-Each literal period will require escaping.
-
-```bash
-# Hmm... Hello. World.
-imessage to alice bob carol. text Hmm...... Hello.. World.
+# To say Hello... World, use 4 periods instead of 3.
+imessage to alice bob carol. text Hello.... World.
 ```
 
 If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.

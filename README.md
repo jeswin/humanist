@@ -68,7 +68,7 @@ console.log(parser("to alice bob carol. text Hello, world."));
 
 ### Argument-less options aka Flags
 
-Simply specify zero as the argument count. Here's an example, with a flag called 'private'.
+A flag is a boolean which indicates whether an option has been specified. It takes no arguments, so the argument count should be set to zero. Here's an example, with a flag called 'private'.
 
 ```bash
 send private to alice bob carol. text Hello, world.
@@ -77,7 +77,7 @@ send private to alice bob carol. text Hello, world.
 send to alice bob carol. private. text Hello, world.
 ```
 
-Options, with args length set to zero. Humanist parses flags as booleans.
+Humanist parses flags as booleans.
 
 ```javascript
 const options = [
@@ -123,7 +123,7 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 
 ### Escaping periods in arguments
 
-If there are one or more literal periods at the end of the option's value (say, "Hello... World"), the literal periods will need to be 'escaped'. Escaping is done by replacing every literal period with two periods. 
+If there are one or more literal periods at the end of the option's value (say, "Hello... World"), the literal periods will need to be 'escaped'. Escaping is done by replacing every literal period with two periods.
 
 ```bash
 # To say "Hello... World", use 6 periods instead of 3.

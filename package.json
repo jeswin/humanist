@@ -1,6 +1,6 @@
 {
   "name": "humanist",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Jeswin Kumar<jeswinpk@agilehead.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,11 +9,10 @@
     "test": "./build.sh && mocha dist/test/test.js"
   },
   "license": "MIT",
-  "dependencies": {
-    "@types/node": "^10.0.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/mocha": "^5.2.0",
+    "@types/node": "^10.0.6",
     "@types/should": "^13.0.0",
     "mocha": "5.1.1",
     "should": "^13.2.1"

@@ -17,10 +17,65 @@ describe("humanist", () => {
     result.comments.should.equal("off");
   });
 
+  it("fails options with one argument when missing args", () => {
+    let msg;
+    try {
+      const parser = humanist([["comments", 1]]);
+      const result = parser("comments");
+    } catch (ex) {
+      msg = ex.message;
+    }
+    msg.should.equal(
+      "Cannot read command line option comments which takes 1 argument."
+    );
+  });
+
+  it("parses options with one argument and terminating period", () => {
+    const parser = humanist([["comments", 1]]);
+    const result = parser("comments off.");
+    result.comments.should.equal("off");
+  });
+
+  it("parses options with one argument having periods and terminating period", () => {
+    const parser = humanist([["comments", 1]]);
+    const result = parser("comments off...");
+    result.comments.should.equal("off.");
+  });
+
   it("parses options with more than 1 argument", () => {
     const parser = humanist([["send", 3]]);
     const result = parser("send alice bob carol");
     result.send.should.deepEqual(["alice", "bob", "carol"]);
+  });
+
+  it("fails options with more than 1 argument when missing args", () => {
+    let msg;
+    try {
+      const parser = humanist([["send", 3]]);
+      const result = parser("send alice bob");
+    } catch (ex) {
+      msg = ex.message;
+    }
+    msg.should.equal("Option send needs 3 arguments, found 2.");
+  });
+
+  it("parses options with more than 1 argument and terminating period", () => {
+    const parser = humanist([["send", 3]]);
+    const result = parser("send alice bob carol.");
+    result.send.should.deepEqual(["alice", "bob", "carol"]);
+  });
+
+  it("fails options with more than 1 argument and terminating period", () => {
+    let msg;
+    try {
+      const parser = humanist([["send", 3]]);
+      const result = parser("send alice bob. carol");
+    } catch (ex) {
+      msg = ex.message;
+    }
+    msg.should.equal(
+      "Option send needs 3 arguments, but was terminated prematurely with a period."
+    );
   });
 
   it("parses options with arbitrary number of arguments", () => {
@@ -67,5 +122,12 @@ describe("humanist", () => {
     const result = parser("title Hello world. send alice bob carol");
     result.title.should.deepEqual(["Hello", "world"]);
     result.send.should.deepEqual(["alice", "bob", "carol"]);
+  });
+
+  it("parses two options of arbitrary length having args with literal periods", () => {
+    const parser = humanist([["title", Infinity], ["send", Infinity]]);
+    const result = parser("title Hello.. world. send alice.. bob.. carol.");
+    result.title.should.deepEqual(["Hello.", "world"]);
+    result.send.should.deepEqual(["alice.", "bob.", "carol."]);
   });
 });

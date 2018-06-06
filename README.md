@@ -23,6 +23,12 @@ imessage to alice bob carol. text Hello, world.
 imessage To alice bob carol. Text Hello, world.
 ```
 
+## Installation
+
+```bash
+npm i humanist
+```
+
 ## Basic grammar and options
 
 Let's consider the first example:
@@ -135,10 +141,10 @@ imessage to alice bob carol. text Hello...... World
 If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.
 
 ```bash
-# The period in jeswin.org does not require escaping since the '.' is not followed by a space
+# Does not need escaping since the '.' is not followed by a space
 imessage to mailbox@jeswin.org text Hi
 
-# The period in 'Hello, world.' does not require escaping since the '.' is at the end of the sentence.
+# Does not require escaping since the '.' is at the end of the sentence.
 imessage to jeswin text Hello, world.
 ```
 

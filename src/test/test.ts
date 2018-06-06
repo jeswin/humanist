@@ -130,4 +130,13 @@ describe("humanist", () => {
     result.title.should.deepEqual(["Hello.", "world"]);
     result.send.should.deepEqual(["alice.", "bob.", "carol."]);
   });
+
+  it("capture unmatched args in an underscore", () => {
+    const parser = humanist([["title", Infinity], ["send", Infinity]]);
+    const result = parser(
+      "title Hello world. lorem send alice bob carol. ipsum dolor"
+    );
+    result.title.should.deepEqual(["Hello", "world"]);
+    result._.should.deepEqual(["lorem", "ipsum", "dolor"]);
+  });
 });

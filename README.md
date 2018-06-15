@@ -50,14 +50,22 @@ const parser = humanist(options);
 }
 */
 console.log(parser("due tomorrow todo Get two bottles of milk"));
+
+/*
+  Passing an array of words yields the same result.
+  With nodejs, you can pass the command line param array.
+*/
+console.log(
+  parser(["due", "tomorrow", "todo", "Get", "two", "bottles", "of", "milk"])
+);
 ```
 
 ### Multiple options of arbitrary length (Delimiters)
 
-Periods can be used as delimiters anywhere in the sentence. A trailing period is not considered a delimiter.
+Humanist uses the period character '.' as a delimiter to separate multi-word options.
 
 ```bash
-send to alice bob carol. text Hello, world.
+send to alice bob carol. text Hello, world
 ```
 
 ```javascript
@@ -66,23 +74,20 @@ const options = [["to", Infinity], ["text", Infinity]];
 /* Prints:
 {
   to: ["alice", "bob", "carol"],
-  text: ["Hello,", "world."]
+  text: ["Hello,", "world"]
 }
 */
-console.log(parser("to alice bob carol. text Hello, world."));
+console.log(parser("to alice bob carol. text Hello, world"));
 ```
 
 ### Argument-less options aka Flags
 
-A flag is a boolean which indicates whether an option has been specified. It takes no arguments, so the argument count should be set to zero. 
+A flag is a boolean which indicates whether an option has been specified. It takes no arguments, so the argument count should be set to zero.
 
-Here's an example, with a flag called 'private'.
+Here's an example, with a flag called 'privately'.
 
 ```bash
-send private to alice bob carol. text Hello, world.
-
-# This is also valid, of course.
-send to alice bob carol. private. text Hello, world.
+send privately to alice bob carol. text Hey, ssup?
 ```
 
 Humanist parses flags as booleans.
@@ -91,25 +96,17 @@ Humanist parses flags as booleans.
 const options = [
   ["to", Infinity],
   ["text", Infinity],
-  ["private", 0] // means it's a flag
+  ["privately", 0] // means it's a flag
 ];
 
 /* Prints:
 {
   to: ["alice", "bob", "carol"],
-  text: ["Hello,", "world."],
-  private: true
+  text: ["Hey,", "ssup?"],
+  privately: true
 }
 */
-console.log(parser("private to alice bob carol. text Hello, world."));
-
-/*
-  Passing an array of words yields the same result.
-  With nodejs, you can pass the command line param array.
-*/
-console.log(
-  parser(["private", "to", "alice", "bob", "carol.", "text", "Hello", "world."])
-);
+console.log(parser("privately to alice bob carol. text Hey, ssup?"));
 ```
 
 ### Join arguments
@@ -129,23 +126,52 @@ const parser = humanist(options);
 console.log(parser("due tomorrow todo Get two bottles of milk"));
 ```
 
-### Escaping periods in arguments
+### Repeating options
 
-If there are one or more literal periods at the end of an argument (say, "Hello... World"), the literal periods will need to be 'escaped'. Escaping is done by replacing every literal period with two periods.
+Options may be repeated in the command line to provide an array of values. In the following example the option 'todo' is repeated thrice, so its value will be an array of strings.
 
 ```bash
-# To say "Hello... World", use 6 periods instead of 3.
-imessage to alice bob carol. text Hello...... World
+tasks due tomorrow todo Get Milk. todo Wash clothes. todo Buy shuttles.
 ```
 
-If the period is not immediately followed by a space or if the period is at the end of the sentence, they do not require escaping.
+```javascript
+const options = [["due", 1], ["todo", Infinity, { join: true }]];
+const parser = humanist(options);
+
+/* Prints:
+{
+  due: "tomorrow",
+  todo: ["Get Milk", "Wash clothes", "Buy shuttles"]
+}
+*/
+console.log(
+  parser("due tomorrow todo Get Milk. todo Wash clothes. todo Buy shuttles.")
+);
+```
+
+Similarly repeating flags will result in an array of booleans.
+
+### Escaping the period
+
+There will be many situations where the period is a valid value for an option.
 
 ```bash
-# Does not need escaping since the '.' is not followed by a space
-imessage to mailbox@jeswin.org text Hi
+book title Don Quixote. Moby Dick. 
+```
 
-# Does not require escaping since the '.' is at the end of the sentence.
-imessage to jeswin text Hello, world.
+There may be cases where you need to accept 'K.' as an valid option, but humanist will mistake it for a delimiter. To escape a 'K.' from being treated as a delimiter, simply say 'KK.'. And if you had to say 'KK.', you'll need to type 'KKK.' and so forth.
+
+```javascript
+const options = [["alphabets", Infinity, { join: true }], ["position", 1]];
+const parser = humanist(options);
+
+/* Prints:
+{
+  alphabets: "E. F. G. H. I. J. K. L.",
+  position: "left"
+}
+*/
+console.log(parser("alphabets E. F. G. H. I. J. KK. L. K. position left"));
 ```
 
 ### Unmatched args at the end of the sentence

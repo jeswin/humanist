@@ -7,35 +7,67 @@ export interface IResult {
 
 export interface IOptionSettings {
   join?: boolean;
+  multiple?: boolean;
 }
 
 export type OptionEntry = [string, number] | [string, number, IOptionSettings];
 
-function concat<T>(x: T[], y: T[]) {
-  return x.concat(y);
+export function assignNonFlag(
+  acc: IResult,
+  prop: string,
+  value: boolean | string | string[],
+  option: OptionEntry
+) {
+  const multiple =
+    option[2] && (option[2] as IOptionSettings).multiple === true;
+
+  if (typeof acc[prop] !== "undefined") {
+    if (Array.isArray(acc[prop])) {
+      (acc[prop] as any).push(value);
+    } else {
+      if (multiple) {
+        acc[prop] = [acc[prop]].concat(value) as any;
+      }
+    }
+  } else {
+    acc[prop] = value;
+  }
 }
 
-function flatMap<T>(f: (x: T) => T[], xs: T[]): T[] {
-  return xs.map(f).reduce(concat, []);
-}
+// function argIsTerminated(arg: string): [boolean, string] {
+//   const periods = /((\.)+)$/.exec(arg);
+//   return periods && periods[1].length > 0
+//     ? ((): [boolean, string] => {
+//         const numPeriods = periods[1].length;
+//         const periodsAfterEscape = Math.floor(numPeriods / 2);
+//         const isOdd = numPeriods % 2 !== 0;
+//         const escaped =
+//           arg.substr(0, arg.length - numPeriods) +
+//           ".".repeat(periodsAfterEscape);
+//         return [isOdd, escaped];
+//       })()
+//     : [false, arg];
+// }
 
-function unescapePeriod(arg: string): string {
-  return "";
-}
+type LiteralResult = [number, string];
 
-function argIsTerminated(arg: string): [boolean, string] {
-  const periods = /((\.)+)$/.exec(arg);
-  return periods && periods[1].length > 0
-    ? ((): [boolean, string] => {
-        const numPeriods = periods[1].length;
-        const periodsAfterEscape = Math.floor(numPeriods / 2);
-        const isOdd = numPeriods % 2 !== 0;
-        const escaped =
-          arg.substr(0, arg.length - numPeriods) +
-          ".".repeat(periodsAfterEscape);
-        return [isOdd, escaped];
-      })()
-    : [false, arg];
+function getLiteral(args: string[], cursor: number): LiteralResult {
+  const acc: string[] = [];
+  let i: number;
+  for (i = cursor; i < args.length; i++) {
+    const arg = args[i];
+    const lcaseArg = arg.toLowerCase();
+    if (lcaseArg === "k.") {
+      break;
+    } else {
+      if (lcaseArg.endsWith("kk.")) {
+        acc.push(arg.substring(arg.length - 2) + ".");
+      } else {
+        acc.push(arg);
+      }
+    }
+  }
+  return [cursor + i, acc.join(" ")];
 }
 
 type Loop = (acc: IResult, cursor: number) => IResult;
@@ -57,6 +89,7 @@ export default function humanist(options: OptionEntry[]) {
       acc: IResult,
       name: string,
       numArgs: number,
+      isLiteral: boolean,
       cursor: number,
       matchingOpt: OptionEntry,
       loop: Loop
@@ -69,13 +102,28 @@ export default function humanist(options: OptionEntry[]) {
       acc: IResult,
       name: string,
       numArgs: number,
+      isLiteral: boolean,
       cursor: number,
       matchingOpt: OptionEntry,
       loop: Loop
     ): IResult {
+      const arg = args[cursor + 1];
       return cursor + 1 < args.length
-        ? ((acc[name] = argIsTerminated(args[cursor + 1])[1]),
-          loop(acc, cursor + 2))
+        ? isLiteral
+          ? (() => {
+              const [literalEnd, value] = getLiteral(args, cursor + 1);
+              return (
+                assignNonFlag(acc, name, value, matchingOpt),
+                loop(acc, literalEnd + 1)
+              );
+            })()
+          : (assignNonFlag(
+              acc,
+              name,
+              /\.$/.test(arg) ? arg.substring(0, arg.length - 1) : arg,
+              matchingOpt
+            ),
+            loop(acc, cursor + 2))
         : exception(
             `Cannot read command line option ${name} which takes 1 argument.`
           );
@@ -85,27 +133,31 @@ export default function humanist(options: OptionEntry[]) {
       acc: IResult,
       name: string,
       numArgs: number,
+      isLiteral: boolean,
       cursor: number,
       matchingOpt: OptionEntry,
       loop: Loop
     ): IResult {
       return cursor + numArgs < args.length
         ? (() => {
-            const testedArgs = args
-              .slice(cursor + 1, cursor + numArgs + 1)
-              .map(x => argIsTerminated(x));
-            const terminatedPrematurely = testedArgs
-              .slice(0, -1)
-              .some(x => x[0]);
-            return terminatedPrematurely
-              ? exception(
-                  exception(
-                    `Option ${name} needs ${numArgs} arguments, ` +
-                      `but was terminated prematurely with a period.`
-                  )
-                )
-              : ((acc[name] = testedArgs.map(x => x[1])),
-                loop(acc, cursor + numArgs + 1));
+            const argsForOpt = args.slice(cursor + 1, cursor + 1 + numArgs);
+            const first = argsForOpt.slice(0, -1);
+            const last = argsForOpt.slice(-1)[0];
+            const periodInNonTrailingArg = first.some(x => /\.$/.test(x));
+
+            return !periodInNonTrailingArg
+              ? (assignNonFlag(
+                  acc,
+                  name,
+                  first.concat(
+                    /\.$/.test(last) ? last.substring(0, last.length - 1) : last
+                  ),
+                  matchingOpt
+                ),
+                loop(acc, cursor + numArgs + 1))
+              : exception(
+                  `Option ${name} needs ${numArgs} arguments, but was terminated prematurely with a period.`
+                );
           })()
         : exception(
             `Option ${name} needs ${numArgs} arguments, found ${args.length -
@@ -117,6 +169,7 @@ export default function humanist(options: OptionEntry[]) {
       acc: IResult,
       name: string,
       numArgs: number,
+      isLiteral: boolean,
       cursor: number,
       matchingOpt: OptionEntry,
       loop: Loop
@@ -128,21 +181,20 @@ export default function humanist(options: OptionEntry[]) {
         const arg = args[cursor + 1 + i];
         return cursor + 1 + i === args.length - 1
           ? argAcc.concat(arg)
-          : (() => {
-              const [isTerminated, escapedArg] = argIsTerminated(arg);
-              return isTerminated
-                ? argAcc.concat(escapedArg)
-                : loopToTerminator(argAcc.concat(escapedArg), i + 1);
-            })();
+          : /\.$/.test(arg)
+            ? argAcc.concat(arg.substring(0, arg.length - 1))
+            : loopToTerminator(argAcc.concat(arg), i + 1);
       })([], 0);
       /* See if need to send back a string */
-      return (
-        (acc[name] =
-          matchingOpt[2] && (matchingOpt[2] as IOptionSettings).join
-            ? optArgs.join(" ")
-            : optArgs),
-        loop(acc, cursor + optArgs.length + 1)
+      assignNonFlag(
+        acc,
+        name,
+        matchingOpt[2] && (matchingOpt[2] as IOptionSettings).join
+          ? optArgs.join(" ")
+          : optArgs,
+        matchingOpt
       );
+      return loop(acc, cursor + optArgs.length + 1);
     }
 
     const result: IResult = (function loop(
@@ -151,7 +203,9 @@ export default function humanist(options: OptionEntry[]) {
     ): IResult {
       return args.length > cursor
         ? (() => {
-            const item = args[cursor];
+            const arg = args[cursor];
+            const isLiteral = /\.$/.test(arg);
+            const item = isLiteral ? arg.substring(0, arg.length - 1) : arg;
             const matchingOpt = options.find(
               o => o[0].toLowerCase() === item.toLowerCase()
             );
@@ -171,7 +225,15 @@ export default function humanist(options: OptionEntry[]) {
                         exception(
                           `The option ${name} cannot have ${numArgs} args. Invalid configuration.`
                         );
-                  return matchFn(acc, name, numArgs, cursor, matchingOpt, loop);
+                  return matchFn(
+                    acc,
+                    name,
+                    numArgs,
+                    isLiteral,
+                    cursor,
+                    matchingOpt,
+                    loop
+                  );
                 })()
               : (acc._.push(item), loop(acc, cursor + 1));
           })()

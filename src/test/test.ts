@@ -36,10 +36,10 @@ describe("humanist", () => {
     result.comments.should.equal("off");
   });
 
-  it("parses options with one argument having periods and terminating period", () => {
+  it("parses options with literal values", () => {
     const parser = humanist([["comments", 1]]);
-    const result = parser("comments off...");
-    result.comments.should.equal("off.");
+    const result = parser("comments. off. for now. k.");
+    result.comments.should.equal("off. for now.");
   });
 
   it("parses options with more than 1 argument", () => {
@@ -65,7 +65,7 @@ describe("humanist", () => {
     result.send.should.deepEqual(["alice", "bob", "carol"]);
   });
 
-  it("fails options with more than 1 argument and terminating period", () => {
+  it("strips trailing period from args", () => {
     let msg;
     try {
       const parser = humanist([["send", 3]]);
@@ -124,11 +124,11 @@ describe("humanist", () => {
     result.send.should.deepEqual(["alice", "bob", "carol"]);
   });
 
-  it("parses two options of arbitrary length having args with literal periods", () => {
-    const parser = humanist([["title", Infinity], ["send", Infinity]]);
-    const result = parser("title Hello.. world. send alice.. bob.. carol.");
-    result.title.should.deepEqual(["Hello.", "world"]);
-    result.send.should.deepEqual(["alice.", "bob.", "carol."]);
+  it("parses two options with literal values", () => {
+    const parser = humanist([["subject", Infinity], ["msg", Infinity]]);
+    const result = parser("subject. Hello world. k. msg. Help me. k.");
+    result.title.should.deepEqual(["Hello world."]);
+    result.send.should.deepEqual(["Help me."]);
   });
 
   it("capture unmatched args in an underscore", () => {

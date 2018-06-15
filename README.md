@@ -1,8 +1,10 @@
 # humanist
 
-A specification and parser for command line options, with a focus on ease of typing on PCs and mobiles. When using humanist to parse command line options, it is recommended to stay close to natural language. That would make humanist-based syntax a good fit for communicating with bots.
+A specification and parser for command line options, with a focus on ease of typing on PCs and mobiles. When using humanist to parse command line options, it is recommended to stay close to natural language. That would make humanist-based syntax a good fit for communicating with bots from PCs and phones.
 
-## What does it look like?
+Humanist commands make extensive use of the period to separate options since it's the symbol that's easiest to type across keyboards. Specifically, on Android and iOS keyboards you can get a period by typing space twice.
+
+## Alright, what does it look like?
 
 Assuming there's app called 'reminder', the command line might look like:
 
@@ -128,14 +130,17 @@ console.log(parser("due tomorrow todo Get two bottles of milk"));
 
 ### Repeating options
 
-Options may be repeated in the command line to provide an array of values. In the following example the option 'todo' is repeated thrice, so its value will be an array of strings.
+With the 'multiple' setting, options may be repeated in the command line to provide an array of values. In the following example the option 'todo' is repeated thrice, so its value will be an array of strings.
 
 ```bash
 tasks due tomorrow todo Get Milk. todo Wash clothes. todo Buy shuttles.
 ```
 
 ```javascript
-const options = [["due", 1], ["todo", Infinity, { join: true }]];
+const options = [
+  ["due", 1],
+  ["todo", Infinity, { multiple: true, join: true }]
+];
 const parser = humanist(options);
 
 /* Prints:
@@ -149,30 +154,45 @@ console.log(
 );
 ```
 
-Similarly repeating flags will result in an array of booleans.
+### Literal strings
 
-### Escaping the period
-
-There will be many situations where the period is a valid value for an option.
-In since cases, use a "k." or "K." as a delimiter. 
+Sometimes it's necessary to accept full sentences or paragraphs as input, which may contain multiple periods in them. To specify a literal, add a period to the name of the option and end it with a 'k.' or 'K.'. The 'k.' is not necessary at the end of the sentence.
 
 ```bash
-book title Don Quixote. title Moby Dick. title War and Peace.
+send to alice bob carol. text. Hey. When are you coming? I am home till 8. K. Send now
 ```
+
+Notice the period after 'text' and the 'K.'. Everything in between is taken literally as a string.
+
+```javascript
+const options = [["to", Infinity], ["text", Infinity], ["send", 1]];
+
+/* Prints:
+{
+  to: ["alice", "bob", "carol"],
+  text: "Hey. When are you coming? I am home till 8.",
+  send: "now"
+}
+*/
+console.log(
+  parser(
+    "to alice bob carol. text. Hey. When are you coming? I am home till 8. K. Send now"
+  )
+);
+```
+
+### Escaping the K.
 
 There may be cases where you need to accept 'K.' as an valid option, but humanist will mistake it for a delimiter. To escape a 'K.' from being treated as a delimiter, simply say 'KK.'. And if you had to say 'KK.', you'll need to type 'KKK.' and so forth.
 
 ```javascript
-const options = [["alphabets", Infinity, { join: true }], ["position", 1]];
-const parser = humanist(options);
-
 /* Prints:
 {
   alphabets: "E. F. G. H. I. J. K. L.",
   position: "left"
 }
 */
-console.log(parser("alphabets E. F. G. H. I. J. KK. L. K. position left"));
+console.log(parser("alphabets. E. F. G. H. I. J. KK. L. K. position left"));
 ```
 
 ### Unmatched args at the end of the sentence
@@ -190,4 +210,25 @@ const parser = humanist(options);
   }
 */
 console.log(parser("to alice bob carol. Hello, world."));
+```
+
+### Custom Handling (Advanced)
+
+Humanist allows custom parsing logic to be added via a callback.
+In the following example, the custom parser handled account names starting with '@'. The options parsed so far are available in the parameter named 'current'.
+
+```js
+interface IResult {
+  _: string[];
+  [key: string]: boolean | string | string[];
+}
+
+function parse(arg: string, index: number, args: string[], current: IResult) {
+  // If it starts with an '@' it's an account name
+  if (/^@/.test(arg)) {
+    const nextIndex = index + 1;
+    const newResult = { ...current, account: arg.substring(1) };
+    return [nextIndex, newResult];
+  }
+}
 ```

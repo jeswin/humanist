@@ -154,9 +154,10 @@ Similarly repeating flags will result in an array of booleans.
 ### Escaping the period
 
 There will be many situations where the period is a valid value for an option.
+In since cases, use a "k." or "K." as a delimiter. 
 
 ```bash
-book title Don Quixote. Moby Dick. 
+book title Don Quixote. title Moby Dick. title War and Peace.
 ```
 
 There may be cases where you need to accept 'K.' as an valid option, but humanist will mistake it for a delimiter. To escape a 'K.' from being treated as a delimiter, simply say 'KK.'. And if you had to say 'KK.', you'll need to type 'KKK.' and so forth.

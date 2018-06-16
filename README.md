@@ -1,6 +1,6 @@
 # humanist
 
-A specification and parser for command line options, with a focus on ease of typing on PCs and mobiles. When using humanist to parse command line options, it is recommended to stay close to natural language. That would make humanist-based syntax a good fit for communicating with bots from PCs and phones.
+A specification and parser for command line grammar which is easy to type on Android and iOS keyboards. When using humanist to parse command line options, it is recommended to stay close to natural language. That would make humanist-based syntax a good fit for communicating with bots from PCs and phones.
 
 Humanist commands make extensive use of the period to separate options since it's the symbol that's easiest to type across keyboards. On Android and iOS keyboards you can get a period by typing space twice.
 

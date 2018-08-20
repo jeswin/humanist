@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@types/mocha@^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.0.tgz#b3c8e69f038835db1a7fdc0b3d879fc50506e29e"
+"@types/mocha@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.5.tgz#8a4accfc403c124a0bafe8a9fc61a05ec1032073"
 
-"@types/node@^10.0.6":
-  version "10.0.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.6.tgz#c0bce8e539bf34c1b850c13ff46bead2fecc2e58"
+"@types/node@^10.7.1":
+  version "10.7.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.7.1.tgz#b704d7c259aa40ee052eec678758a68d07132a2e"
 
 "@types/should@^13.0.0":
   version "13.0.0"
@@ -31,9 +31,9 @@ browser-stdout@1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/browser-stdout/-/browser-stdout-1.3.1.tgz#baa559ee14ced73452229bad7326467c61fabd60"
 
-commander@2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
+commander@2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -68,13 +68,13 @@ glob@7.1.2:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-growl@1.10.3:
-  version "1.10.3"
-  resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.3.tgz#1926ba90cf3edfe2adb4927f5880bc22c66c790f"
+growl@1.10.5:
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
 
-has-flag@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-2.0.0.tgz#e8207af1cc7b30d446cc70b734b5e8be18f88d51"
+has-flag@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-3.0.0.tgz#b5d454dc2199ae225699f3467e5a07f3b955bafd"
 
 he@1.1.1:
   version "1.1.1"
@@ -107,21 +107,21 @@ mkdirp@0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mocha@5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/mocha/-/mocha-5.1.1.tgz#b774c75609dac05eb48f4d9ba1d827b97fde8a7b"
+mocha@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/mocha/-/mocha-5.2.0.tgz#6d8ae508f59167f940f2b5b3c4a612ae50c90ae6"
   dependencies:
     browser-stdout "1.3.1"
-    commander "2.11.0"
+    commander "2.15.1"
     debug "3.1.0"
     diff "3.5.0"
     escape-string-regexp "1.0.5"
     glob "7.1.2"
-    growl "1.10.3"
+    growl "1.10.5"
     he "1.1.1"
     minimatch "3.0.4"
     mkdirp "0.5.1"
-    supports-color "4.4.0"
+    supports-color "5.4.0"
 
 ms@2.0.0:
   version "2.0.0"
@@ -165,9 +165,9 @@ should-util@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/should-util/-/should-util-1.0.0.tgz#c98cda374aa6b190df8ba87c9889c2b4db620063"
 
-should@*, should@^13.2.1:
-  version "13.2.1"
-  resolved "https://registry.yarnpkg.com/should/-/should-13.2.1.tgz#84e6ebfbb145c79e0ae42307b25b3f62dcaf574e"
+should@*, should@^13.2.3:
+  version "13.2.3"
+  resolved "https://registry.yarnpkg.com/should/-/should-13.2.3.tgz#96d8e5acf3e97b49d89b51feaa5ae8d07ef58f10"
   dependencies:
     should-equal "^2.0.0"
     should-format "^3.0.3"
@@ -175,11 +175,11 @@ should@*, should@^13.2.1:
     should-type-adaptors "^1.0.1"
     should-util "^1.0.0"
 
-supports-color@4.4.0:
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-4.4.0.tgz#883f7ddabc165142b2a61427f3352ded195d1a3e"
+supports-color@5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.4.0.tgz#1c6b337402c2137605efe19f10fec390f6faab54"
   dependencies:
-    has-flag "^2.0.0"
+    has-flag "^3.0.0"
 
 wrappy@1:
   version "1.0.2"
